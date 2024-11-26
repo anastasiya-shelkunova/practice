@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/06ea71df-30a1-4fae-888a-82c9fa655e00)# practice
+# practice
 # Flatter
 # Лекция 1
 1. Установка Flutter, распоковываем в в {имя_пользователя}/dev/<br>
