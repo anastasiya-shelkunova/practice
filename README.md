@@ -13,7 +13,14 @@
 ![image](https://github.com/user-attachments/assets/c9f98930-8db1-452c-9374-c5a0945d2c29)<br>
 7. Настройка Android Studio<br>
 ![image](https://github.com/user-attachments/assets/7f44a843-d87a-400e-82d4-08b6c360552d)<br>
-8.Установка и настройка VS Code<br>![image](https://github.com/user-attachments/assets/81af538d-56c2-4d84-b151-fdecbf3a766c)<br>
+8. Установка и настройка VS Code<br>
+9. Проверяем Flutter doctor <br>
+10. Вывод:
+11. Запуск в браузере:
+12. Запуск на эмуляторе:
+
+8.Установка и настройка 
+![image](https://github.com/user-attachments/assets/81af538d-56c2-4d84-b151-fdecbf3a766c)<br>
 9. Проверяем Flutter doctor <br>
 ![image](https://github.com/user-attachments/assets/d1720880-ab89-4eb2-b034-5f50d934cb99)<br>
 10. Вывод:
