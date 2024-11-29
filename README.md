@@ -1,5 +1,5 @@
 # Flatter
-# Лекция 1
+## _**Лекция 1**_
 1. Установка Flutter, распоковываем в в {имя_пользователя}/dev/<br>
 2. Установка значения Path<br>
 ![image](https://github.com/user-attachments/assets/f7ae914a-9704-4372-bfa0-a35cb89bb116)<br>
@@ -22,7 +22,135 @@
 
 
 
+## _**Лекция 2**_
+1. Создаем виджет без сохранения состояния <br>
+```dart
+import 'package:flutter/material.dart';
 
+void main() {
+  runApp(const MyStatelessWidget(color: Colors.red));
+}
+
+class MyStatelessWidget extends StatelessWidget{
+  const MyStatelessWidget({super.key, required this.color});
+  final Color color;
+  @override
+  Widget build(BuildContext context) {  
+    return Container(
+      color: color
+    );
+  }
+}
+```
+<br>
+![image](https://github.com/user-attachments/assets/17411143-c56a-4f8d-a6db-2633fbd2e76c)
+<br>
+2. Изменяю код для виджета с отслеживанием состояния, добавляю Stateful <br>
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyStatelessWidget(color: const Color.fromARGB(255, 231, 244, 54)));
+}
+
+class MyStatelessWidget extends StatefulWidget {
+  const MyStatelessWidget({super.key, required this.color});
+
+  final Color color;
+
+  @override
+  State<MyStatelessWidget> createState() => _MyStatelessWidgetState();
+}
+
+class _MyStatelessWidgetState extends State<MyStatelessWidget> {
+  late Color color;
+  void initState() {
+    super.initState();
+    color = widget.color;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          color = const Color.fromARGB(255, 38, 186, 231);
+        });
+      },
+      child: Container(color: color),
+    );
+  }
+}
+```
+<br>
+При нажатии цвет фона менется на другой <br>
+![image](https://github.com/user-attachments/assets/b9723154-abb2-4007-a336-4453ac0925e6)
+<br>
+3. Работа с Asset и Image
+3.1 Создаю новую папку с именем "Asset" <br>
+![image](https://github.com/user-attachments/assets/bb80a1dd-da54-437d-98f3-af4bb5e3cd4d)
+<br>
+3.2 Добавляю в эту папку изображение <br>
+3.3 Добавляю код в файл с расширением yaml <br>
+![image](https://github.com/user-attachments/assets/4c949fd5-434d-4d9b-b701-40d2d0609b85)
+<br>
+![image](https://github.com/user-attachments/assets/355b7782-b480-4589-ac5d-a0b093b764a7)
+<br>
+3.4 Изменяем код в main.dart <br>
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp( MaterialApp(
+    home: Scaffold(
+appBar: AppBar(
+  title: const Text('Title'),
+  actions:[IconButton(onPressed: (){}, icon: const Icon(Icons.add))],
+),
+    body: MyStatelessWidget(color: Colors.red),
+     floatingActionButton: IconButton(onPressed: (){}, icon: const Icon(Icons.add)),
+)));
+}
+
+class MyStatelessWidget extends StatefulWidget{
+  const MyStatelessWidget({super.key, required this.color});
+  
+  final Color color;
+
+  @override
+  State<MyStatelessWidget> createState() => _MyStatelessWidgetState();
+}
+
+class _MyStatelessWidgetState extends State<MyStatelessWidget> {
+  late Color color;
+  void initState(){
+    super.initState();
+    color=widget.color;
+  }
+  
+  @override
+  Widget build(BuildContext context) {  
+    return GestureDetector( 
+      onTap: () {
+        setState(() {
+                  color = Colors.green;
+        });
+      },
+      child: Container(
+        color: color,
+        child: Image.asset('Assets/zzz.jpg'),
+      ),
+    );
+  }
+}
+```
+<br>
+Но возникает ошибка: <br>
+![image](https://github.com/user-attachments/assets/6e7f7c78-6273-43da-98bd-c730fed9219b)
+<br>
+После исправления ошибки: <br>
+![image](https://github.com/user-attachments/assets/b8e4a7f4-ca24-47f0-aad5-5846cc0d675a)
+<br>
 
 
 
