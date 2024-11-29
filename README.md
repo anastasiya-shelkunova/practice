@@ -235,3 +235,335 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
 
 ![image](https://github.com/user-attachments/assets/7548b534-8d90-48e6-ae0b-bed7da3728ef)
 <br>
+
+## _**Лекция 3**_
+1. Создает простое Flutter-приложение с двумя квадратами (контейнерами), расположенными по центру экрана<br>
+
+```dart
+
+import 'package:flutter/material.dart';
+import 'dart:math';
+
+void main() {
+  runApp(const MaterialApp(
+    home: PositionedTile(),
+  ));
+}
+
+class PositionedTile extends StatefulWidget {
+  const PositionedTile({super.key});
+
+  @override
+  State<PositionedTile> createState() => _PositionedTileState();
+}
+
+class _PositionedTileState extends State<PositionedTile> {
+  late List<Widget> tiles;
+
+  @override
+  void initState() {
+    super.initState();
+    tiles = <StatefullColorTile>[StatefullColorTile(), StatefullColorTile()];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: tiles,
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+          onPressed: swapTiles,
+          child: const Icon(
+            Icons.swap_horiz,
+          )),
+    );
+  }
+
+  void swapTiles() {
+    setState(() {
+      tiles.insert(1, tiles.removeAt(0));
+    });
+  }
+}
+
+class StatefullColorTile extends StatefulWidget {
+  const StatefullColorTile({super.key});
+
+  @override
+  State<StatefullColorTile> createState() => _StatelfulColorfulTileState();
+}
+
+class _StatelfulColorfulTileState extends State<StatefullColorTile> {
+  late Color color;
+
+  @override
+  void initState() {
+    super.initState();
+    color = Colors.primaries[Random().nextInt(Colors.primaries.length)];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(width: 250, height: 250, color: color);
+  }
+}
+```
+
+<br>
+
+Результат:
+<br>
+
+![image](https://github.com/user-attachments/assets/11101cee-fcf6-43a1-a86a-0e291aac8a4a)
+
+<br>
+
+2. Что бы поменять их местами, надо добавить в код ключи: <br>
+
+```dart
+import 'dart:math';
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(
+    home: PositionedTile(),
+  ));
+}
+
+class PositionedTile extends StatefulWidget {
+  const PositionedTile({super.key});
+
+  @override
+  State<PositionedTile> createState() => _PositionedTileState();
+}
+
+class _PositionedTileState extends State<PositionedTile> {
+  late List<Widget> tiles;
+
+  @override
+  void initState() {
+    super.initState();
+    tiles = [
+      StatefullColorTile(
+        key: UniqueKey(),
+      ),
+      StatefullColorTile(
+        key: UniqueKey(),
+      )
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        // Центрирование всего содержимого
+        child: Row(
+          mainAxisSize:
+              MainAxisSize.min, // Уменьшаем строку до минимального размера
+          mainAxisAlignment:
+              MainAxisAlignment.center, // Центрируем по горизонтали
+          crossAxisAlignment:
+              CrossAxisAlignment.center, // Центрируем по вертикали
+          children: tiles,
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+          onPressed: swapTiles,
+          child: const Icon(
+            Icons.swap_horiz, // Меняем значок для ясности
+          )),
+    );
+  }
+
+  void swapTiles() {
+    setState(() {
+      tiles.insert(1, tiles.removeAt(0)); // Меняем виджеты местами
+    });
+  }
+}
+
+class StatefullColorTile extends StatefulWidget {
+  const StatefullColorTile({super.key});
+
+  @override
+  State<StatefullColorTile> createState() => _StatelfulColorfulTileState();
+}
+
+class _StatelfulColorfulTileState extends State<StatefullColorTile> {
+  late Color color;
+
+  @override
+  void initState() {
+    super.initState();
+    color = Colors.primaries[Random()
+        .nextInt(Colors.primaries.length)]; // Генерация случайного цвета
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 250,
+      height: 250,
+      color: color,
+    );
+  }
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/913d450e-feb1-4363-8cf7-9f68cae7a256)
+
+<br>
+
+<br>
+
+![image](https://github.com/user-attachments/assets/e9f5acf6-33d3-466e-8027-63f789e9b1f2)
+
+<br>
+
+## _**Лекция 4**_
+1. Создаем код, который использует такие виджеты как:
+
+<br>Layout Widgets<br>
+<br>Padding<br>
+<br>Align<br>
+<br>Center<br>
+<br>Container<br>
+<br>Row<br>
+<br>Column<br>
+<br>Expanded<br>
+<br>Stack<br>
+<br>ListView <br>
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(home: LayoutWidgetsExample()));
+}
+
+class LayoutWidgetsExample extends StatelessWidget {
+  const LayoutWidgetsExample({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Layout Widgets Example'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0), // Padding вокруг всего содержимого
+        child: Column(
+          children: [
+            // Использование Center для центровки текста
+            Center(
+              child: Text(
+                'Using Layout Widgets',
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineSmall, // Актуальный стиль
+              ),
+            ),
+            const SizedBox(height: 16), // Отступ между элементами
+            // Использование Align для выравнивания текста
+            Align(
+              alignment: Alignment.centerRight,
+              child: const Text(
+                'Aligned to Right',
+                style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 117, 189, 247)),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Контейнер с цветным фоном
+            Container(
+              color: Colors.lightBlue,
+              height: 100,
+              width: double.infinity,
+              child: const Center(
+                child: Text(
+                  'This is a Container',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Row с двумя контейнерами
+            Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    height: 50,
+                    color: Colors.green,
+                    child: const Center(child: Text('Row Item 1')),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    height: 50,
+                    color: Colors.orange,
+                    child: const Center(child: Text('Row Item 2')),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            // Использование Stack
+            Stack(
+              children: [
+                Container(
+                  height: 100,
+                  color: Colors.purple,
+                ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                    height: 50,
+                    width: 50,
+                    color: Colors.yellow,
+                    child: const Center(child: Text('Stack')),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            // ListView внутри Expanded
+            Expanded(
+              child: ListView(
+                children: List.generate(
+                  10,
+                  (index) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Container(
+                      height: 50,
+                      color: Colors.primaries[index % Colors.primaries.length],
+                      child: Center(
+                        child: Text('ListView Item ${index + 1}'),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/c1d1925b-ff03-453e-9cee-59a7d18e4354)
+
+<br>
+
+
+
+
