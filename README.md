@@ -1182,7 +1182,408 @@ class ScreenB extends StatelessWidget {
 
 <br>
 
+## _**Лекция 7**_
+1. Form<br>
+Form используется для объединения и управления несколькими полями ввода.<br>
 
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(home: MyForm()));
+}
+
+class MyForm extends StatelessWidget {
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Form Example')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Enter your name'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    print('Form is valid!');
+                  }
+                },
+                child: Text('Submit'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/7e9a3ad2-30be-4cea-87c4-7cba4a7c992f)
+
+<br>
+
+![image](https://github.com/user-attachments/assets/30ae4e1b-ad05-426f-acbf-2e3cf5ee2823)
+
+<br>
+2. TextField и TextFormField<br>
+
+TextField и TextFormField используются для ввода текста.<br>
+
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: MyTextFieldExample(),
+  ));
+}
+
+class MyTextFieldExample extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('TextField and TextFormField Example')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'TextField',
+                hintText: 'Enter text here',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16.0),
+            TextFormField(
+              decoration: InputDecoration(
+                labelText: 'TextFormField',
+                hintText: 'Enter text here',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/c249e7f0-068f-4fd9-9cca-3864c9b29f51)
+
+<br>
+
+
+3. Стилизация полей ввода<br>
+
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: StyledTextField(),
+  ));
+}
+
+class StyledTextField extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Styled TextField')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: TextField(
+          decoration: InputDecoration(
+            labelText: 'Enter text',
+            border: OutlineInputBorder(),
+            prefixIcon: Icon(Icons.person),
+            filled: true,
+            fillColor: Colors.grey[200],
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/111045b8-f736-4f1c-a9b3-c7b449a34857)
+
+<br>
+
+4. Ограничения ввода в поля формы<br>
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: LimitedInputField(),
+  ));
+}
+
+class LimitedInputField extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Limited Input Example')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: TextField(
+          decoration: InputDecoration(
+            labelText: 'Enter digits only',
+            hintText: '12345',
+            border: OutlineInputBorder(),
+          ),
+          keyboardType: TextInputType.number, // Открывает цифровую клавиатуру
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly
+          ], // Ограничение: только цифры
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+При вводе букв (например, "a", "b") или символов (например, "!"), они будут проигнорированы.<br>
+
+![image](https://github.com/user-attachments/assets/bf86961f-9742-4348-9b2b-d604fb7645a5)
+
+<br>
+
+5. Получение текста из полей формы <br>
+
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: GetTextExample(),
+  ));
+}
+
+class GetTextExample extends StatelessWidget {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Get Text from TextField')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _controller,
+              decoration: InputDecoration(labelText: 'Enter some text'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                print('Entered text: ${_controller.text}');
+              },
+              child: Text('Print Text'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/fa686781-72f1-40e3-b254-6e08ffd83307)
+
+<br>
+
+![image](https://github.com/user-attachments/assets/218eb69c-6581-46a2-9357-beeb5f876783)
+
+<br>
+6. Валидация полей формы<br>
+
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: ValidationExample(),
+  ));
+}
+
+class ValidationExample extends StatelessWidget {
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Form Validation')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Enter email'),
+                validator: (value) {
+                  if (value == null || !value.contains('@')) {
+                    return 'Enter a valid email';
+                  }
+                  return null;
+                },
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    print('Form is valid');
+                  }
+                },
+                child: Text('Submit'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/b33b8126-30ef-49f2-a171-2001066ace17)
+
+<br>
+
+![image](https://github.com/user-attachments/assets/c58caecb-4e50-4c2a-bf22-de8a99f64244)
+
+<br>
+
+7. Выпадающий список<br>
+
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: DropdownExample(),
+  ));
+}
+
+class DropdownExample extends StatefulWidget {
+  @override
+  _DropdownExampleState createState() => _DropdownExampleState();
+}
+
+class _DropdownExampleState extends State<DropdownExample> {
+  String? _selectedValue; // Хранит выбранное значение
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Dropdown Example')),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DropdownButton<String>(
+              value: _selectedValue, // Текущее выбранное значение
+              hint: Text('Select an option'), // Подсказка
+              items: ['Option 1', 'Option 2', 'Option 3']
+                  .map((value) => DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      ))
+                  .toList(),
+              onChanged: (newValue) {
+                setState(() {
+                  _selectedValue = newValue; // Обновление выбранного значения
+                });
+              },
+            ),
+            SizedBox(height: 16.0),
+            if (_selectedValue != null)
+              Text(
+                'Selected: $_selectedValue',
+                style: TextStyle(fontSize: 18.0),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/c384d1d7-49bb-4bfc-8d2b-94934c779355)
+
+<br>
+
+![image](https://github.com/user-attachments/assets/b85bc554-9080-4c22-a8da-6ed3bcfe1337)
+
+<br>
+
+![image](https://github.com/user-attachments/assets/9ba1c5c4-e830-46ed-aa9e-3771bf14ea97)
+
+<br>
+
+
+8. "Фокусировка" полей ввода<br>
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: FocusExample(),
+  ));
+}
+
+class FocusExample extends StatelessWidget {
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Focus Example')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(focusNode: _focusNode),
+            ElevatedButton(
+              onPressed: () {
+                _focusNode.requestFocus();
+              },
+              child: Text('Focus TextField'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+
+
+![image](https://github.com/user-attachments/assets/cd8ee200-2b1e-4256-95fa-853754fc6f92)
+
+<br>
 
 
 
