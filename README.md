@@ -806,3 +806,385 @@ void main() {
 ![image](https://github.com/user-attachments/assets/e946dca7-7c6c-4667-8305-4540b1f04938)
 
 <br>
+
+## _**Лекция 6**_
+1. Простая навигация <br>
+Навигация с помощью Navigator.push.<br>
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(home: ScreenA()));
+}
+
+class ScreenA extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Screen A')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ScreenB()),
+            );
+          },
+          child: Text('Go to Screen B'),
+        ),
+      ),
+    );
+  }
+}
+
+class ScreenB extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Screen B')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text('Back to Screen A'),
+        ),
+      ),
+    );
+  }
+}
+```
+
+<br>
+Первый экран <br>
+
+![image](https://github.com/user-attachments/assets/60dc23a5-d3d2-4405-8280-c82da62b1e35)
+
+<br>
+Второй экран <br>
+
+![image](https://github.com/user-attachments/assets/b04e6e98-e788-411e-8d26-f02967695de3)
+
+<br>
+2. Навигация по имени<br>
+Используем именованные маршруты.<br>
+
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    initialRoute: '/',
+    routes: {
+      '/': (context) => ScreenA(),
+      '/screenB': (context) => ScreenB(),
+    },
+  ));
+}
+
+class ScreenA extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Screen A')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.pushNamed(context, '/screenB');
+          },
+          child: Text('Go to Screen B'),
+        ),
+      ),
+    );
+  }
+}
+
+class ScreenB extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Screen B')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text('Back to Screen A'),
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+Screen B<br>
+
+![image](https://github.com/user-attachments/assets/29d8c51b-3e65-4bee-9fbc-81517d793cf3)
+
+<br>
+
+Screen A<br>
+
+![image](https://github.com/user-attachments/assets/2d89848d-9304-4781-a8ad-f1f5e4d71c87)
+
+<br>
+
+3. Простая передача данных между экранами<br>
+Передача данных через Navigator.push.<br>
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(home: ScreenA()));
+}
+
+class ScreenA extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Screen A')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ScreenB(data: 'Hello from Screen A!'),
+              ),
+            );
+          },
+          child: Text('Go to Screen B'),
+        ),
+      ),
+    );
+  }
+}
+
+class ScreenB extends StatelessWidget {
+  final String data;
+  ScreenB({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Screen B')),
+      body: Center(
+        child: Text(data),
+      ),
+    );
+  }
+}
+```
+<br>
+
+Экран А<br>
+
+![image](https://github.com/user-attachments/assets/475fda02-d1b7-45a0-b205-a4d37e0bcfec)
+
+<br>
+
+Экран В <br>
+
+![image](https://github.com/user-attachments/assets/7f153d2a-8ac6-4876-b02d-4262d204b19c)
+
+<br>
+
+4. Передача данных при навигации по имени<br>
+Передача данных с использованием Navigator.pushNamed.<br>
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    initialRoute: '/',
+    routes: {
+      '/': (context) => ScreenA(),
+      '/screenB': (context) => ScreenB(),
+    },
+  ));
+}
+
+class ScreenA extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Screen A')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.pushNamed(
+              context,
+              '/screenB',
+              arguments: 'Hello from Screen A!',
+            );
+          },
+          child: Text('Go to Screen B'),
+        ),
+      ),
+    );
+  }
+}
+
+class ScreenB extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final String data = ModalRoute.of(context)!.settings.arguments as String;
+
+    return Scaffold(
+      appBar: AppBar(title: Text('Screen B')),
+      body: Center(
+        child: Text(data),
+      ),
+    );
+  }
+}
+```
+<br>
+
+Экран А <br>
+
+![image](https://github.com/user-attachments/assets/e2aa63ba-cec5-4d75-9819-807599853be7)
+
+<br>
+
+Экран В <br>
+
+![image](https://github.com/user-attachments/assets/2d11b4ca-cfab-49a1-a8b7-e195f8c150ee)
+
+<br>
+5. Передача данных с onGenerateRoute<br>
+Обработчик маршрутов, позволяющий передавать данные.<br>
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    initialRoute: '/',
+    onGenerateRoute: (settings) {
+      if (settings.name == '/screenB') {
+        final String data = settings.arguments as String;
+        return MaterialPageRoute(
+          builder: (context) => ScreenB(data: data),
+        );
+      }
+      return null;
+    },
+    home: ScreenA(),
+  ));
+}
+
+class ScreenA extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Screen A')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.pushNamed(
+              context,
+              '/screenB',
+              arguments: 'Hello from Screen A!',
+            );
+          },
+          child: Text('Go to Screen B'),
+        ),
+      ),
+    );
+  }
+}
+
+class ScreenB extends StatelessWidget {
+  final String data;
+  ScreenB({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Screen B')),
+      body: Center(
+        child: Text(data),
+      ),
+    );
+  }
+}
+```
+<br>
+Результат: <br>
+
+![image](https://github.com/user-attachments/assets/35e4d748-09b1-4cb0-88e5-2b58fd74e646)
+
+<br>
+6. Передача данных с использованием обратного возврата<br>
+Возвращаем данные после завершения экрана.<br>
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(home: ScreenA()));
+}
+
+class ScreenA extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Screen A')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ScreenB()),
+            );
+            print('Result: $result');
+          },
+          child: Text('Go to Screen B'),
+        ),
+      ),
+    );
+  }
+}
+
+class ScreenB extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Screen B')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.pop(context, 'Data from Screen B');
+          },
+          child: Text('Return to Screen A'),
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+
+Экран А <br>
+
+![image](https://github.com/user-attachments/assets/e901e5d0-c4e6-42af-b315-f44514e1a93d)
+
+<br>
+Экран В <br>
+
+![image](https://github.com/user-attachments/assets/0c5ec679-b156-47b1-81bf-7a17053d0035)
+
+<br>
+
+![image](https://github.com/user-attachments/assets/7616f82c-8e5a-4ab4-bfa0-fa0bf026d341)
+
+<br>
+
+
+
+
+
+
+
+
+
+
