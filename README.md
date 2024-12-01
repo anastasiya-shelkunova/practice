@@ -686,9 +686,9 @@ void main() {
 ![image](https://github.com/user-attachments/assets/6e487d93-7930-42cd-a504-083e8b2a1a20)
 
 <br>
+
 5. Каскадный null-aware оператор<br>
-Позволяет безопасно вызывать методы у nullable объектов.
-<br>
+Позволяет безопасно вызывать методы у nullable объектов.<br>
 
 ```dart
 import 'package:flutter/material.dart';
@@ -1054,6 +1054,7 @@ class ScreenB extends StatelessWidget {
 <br>
 5. Передача данных с onGenerateRoute<br>
 Обработчик маршрутов, позволяющий передавать данные.<br>
+
 ```dart
 import 'package:flutter/material.dart';
 
@@ -1110,13 +1111,15 @@ class ScreenB extends StatelessWidget {
 }
 ```
 <br>
-Результат: <br>
+Результат:<br>
 
 ![image](https://github.com/user-attachments/assets/35e4d748-09b1-4cb0-88e5-2b58fd74e646)
 
 <br>
+
 6. Передача данных с использованием обратного возврата<br>
 Возвращаем данные после завершения экрана.<br>
+
 ```dart
 import 'package:flutter/material.dart';
 
