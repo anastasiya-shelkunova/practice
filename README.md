@@ -564,6 +564,245 @@ class LayoutWidgetsExample extends StatelessWidget {
 
 <br>
 
+## _**Лекция 5**_
+1. Что такое Null Safety <br>
+Null Safety — это механизм в Dart, который предотвращает ошибки, связанные с обращением к объектам, которые могут быть null. Основная цель — сделать код более безопасным, обеспечивая, что переменные могут быть null, только если это явно указано.<br>
 
+```dart
+import 'package:flutter/material.dart';
 
+void main() {
+  int? nullableNumber; // Может быть null
+  nullableNumber = null; // Разрешено
+  print(nullableNumber); // Вывод: null
 
+  int nonNullableNumber = 42; // Не может быть null
+  print(nonNullableNumber); // Вывод: 42
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/55a755dc-60a2-4864-b243-7be248aee4d0)
+
+<br>
+
+2. Основные принципы Null Safety<br>
+
+Переменные должны быть объявлены либо как "nullable" (Тип?), либо "non-nullable" (Тип).
+Инициализация: Все non-nullable переменные должны быть инициализированы значением.
+Null-aware операторы помогают безопасно работать с nullable-объектами.<br>
+
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  String? nullableString; // Может быть null
+  nullableString = 'Hello';
+  print(nullableString); // Вывод: Hello
+
+  String nonNullableString = 'Dart is awesome!'; // Не может быть null
+  print(nonNullableString); // Вывод: Dart is awesome!
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/f7f8c8c6-3e43-418f-bf46-dd4902c6ac3c)
+
+<br>
+
+3. Иерархия типов<br>
+
+Иерархия типов подразумевает, что null может быть присвоен только переменным типа Type?.<br>
+
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  String? nullableString = null; // Может быть null
+  nullableString ??= 'Default Value'; // Присваивается, если значение null
+  print(nullableString); // Вывод: Default Value
+
+  String nonNullableString = 'Not null!';
+  print(nonNullableString); // Вывод: Not null!
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/afc6d060-9406-4f50-a155-c888c9376469)
+
+<br>
+
+4. Null-aware операторы<br>
+Операторы для работы с null.<br>
+Оператор ?? <br>
+
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  int? nullableNumber = null;
+  int result =
+      nullableNumber ?? 10; // Возвращает 10, если nullableNumber == null
+  print(result); // Вывод: 10
+}
+```
+
+<br>
+
+![image](https://github.com/user-attachments/assets/0c698793-50fa-4a94-8eb6-bb14f081753e)
+
+<br>
+
+Оператор ?.<br>
+
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  String? nullableString = null;
+  print(nullableString?.length); // Не вызывает ошибку, возвращает null
+  // Вывод: null
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/e4c980ac-87b4-4e37-a338-f61551c8426d)
+
+<br>
+
+Оператор ??= <br>
+
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  int? value;
+  value ??= 5; // Присваивает 5, если значение null
+  print(value); // Вывод: 5
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/6e487d93-7930-42cd-a504-083e8b2a1a20)
+
+<br>
+5. Каскадный null-aware оператор<br>
+Позволяет безопасно вызывать методы у nullable объектов.
+<br>
+
+```dart
+import 'package:flutter/material.dart';
+
+class Person {
+  String? name;
+  void setName(String newName) => name = newName;
+}
+
+void main() {
+  Person? person = null;
+  person?..setName('Alice'); // Не вызывает метод, если person == null
+  print(person?.name); // Вывод: null
+
+  person = Person();
+  person?..setName('Bob'); // Устанавливаем имя
+  print(person?.name); // Вывод: Bob
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/57955413-402f-45ae-9d88-f2d90211bba7)
+
+<br>
+
+6. Модификатор late <br>
+Позволяет отложить инициализацию переменных, которые не могут быть null.<br>
+
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  late String greeting;
+  greeting = 'Hello, late initialization!';
+  print(greeting); // Вывод: Hello, late initialization!
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/4e01a7ce-e873-41fc-861c-75f2fa14f8e9)
+
+<br>
+
+7. Работа с коллекциями <br>
+Коллекции поддерживают null-safe операции.<br>
+
+Коллекция с nullable элементами:<br>
+
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  List<int?> numbers = [1, 2, null, 4];
+  print(numbers); // Вывод: [1, 2, null, 4]
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/a3974526-c4bd-4d9c-b1fe-adf1127e9baa)
+
+<br>
+
+Удаление null-значений:<br>
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  List<int?> numbers = [1, null, 3];
+  List<int> nonNullableNumbers = numbers.whereType<int>().toList();
+  print(nonNullableNumbers); // Вывод: [1, 3]
+}
+```
+![image](https://github.com/user-attachments/assets/470ded71-5767-43c0-b071-303da4d70872)
+
+<br>
+
+8. Работа с параметрами класса<br>
+Позволяет указывать, может ли параметр быть null.<br>
+
+```dart
+import 'package:flutter/material.dart';
+
+class User {
+  final String name;
+  final String? email;
+
+  User(this.name, this.email);
+}
+
+void main() {
+  User user = User('Alice', null); // email может быть null
+  print(user.name); // Вывод: Alice
+  print(user.email ?? 'No email provided'); // Вывод: No email provided
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/4b9eeb5e-2490-4961-b95e-e78a46db1c16)
+<br>
+
+9. Работа с параметрами функций<br>
+Nullable параметры позволяют передавать null.<br>
+```dart
+void greet(String? name) {
+  print('Hello, ${name ?? 'Guest'}!');
+}
+
+void main() {
+  greet(null); // Вывод: Hello, Guest!
+  greet('Alice'); // Вывод: Hello, Alice!
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/e946dca7-7c6c-4667-8305-4540b1f04938)
+
+<br>
