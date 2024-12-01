@@ -1584,11 +1584,309 @@ class FocusExample extends StatelessWidget {
 ![image](https://github.com/user-attachments/assets/cd8ee200-2b1e-4256-95fa-853754fc6f92)
 
 <br>
+9. SnackBar- демонстрирует, как отобразить кратковременное всплывающее сообщение внизу экрана в приложении Flutter.<br>
+
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: SnackBarExample(),
+  ));
+}
+
+class SnackBarExample extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('SnackBar Example')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('This is a SnackBar!')),
+            );
+          },
+          child: Text('Show SnackBar'),
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/76836b6d-96fa-45a5-abc0-76c2ba3dc6ec)
+
+<br>
+
+![image](https://github.com/user-attachments/assets/f0d4e589-8e97-4924-87a1-e871b8685771)
+
+<br>
 
 
+10. AlertDialog - используется для отображения всплывающего окна с предупреждением (или диалогом) поверх основного интерфейса.
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: AlertDialogExample(),
+  ));
+}
+
+class AlertDialogExample extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('AlertDialog Example')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text('Alert'),
+                content: Text('This is an alert dialog.'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          },
+          child: Text('Show Alert'),
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/1fd42459-b2bf-4966-865e-0b0e337296be)
+
+<br>
+
+![image](https://github.com/user-attachments/assets/68a5beb9-246e-420c-8c9b-489dceb449d2)
+
+<br>
+
+11. Использование жестов<br>
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: GestureExample(),
+  ));
+}
+
+class GestureExample extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Gesture Example')),
+      body: GestureDetector(
+        onTap: () {
+          print('Screen tapped');
+        },
+        child: Container(
+          color: Colors.blue,
+          child: Center(
+            child: Text('Tap anywhere', style: TextStyle(color: Colors.white)),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/2d77aa19-07d5-4764-8719-8711a0d844b5)
+
+<br>
+
+![image](https://github.com/user-attachments/assets/940e44c6-6b98-452b-9362-581a2f2560d1)
+
+<br>
+
+## _**Лекция 8**_
+1. Загружаем данные из HTTP (в формате JSON).<br>
+2. Выполняем ручную сериализацию JSON с помощью создания модели.<br>
+3. Демонстрация автоматическую сериализацию JSON с использованием пакета json_serializable.<br>
+
+```dart
+import 'dart:convert'; 
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http; 
+import 'package:json_annotation/json_annotation.dart'; 
+
+part 'main.g.dart'; // Генерируемая часть для json_serializable
+
+void main() {
+  runApp(MaterialApp(
+    home: JsonExample(),
+  ));
+}
+
+// Модель для ручной сериализации
+class Post {
+  final int userId;
+  final int id;
+  final String title;
+  final String body;
+
+  Post(
+      {required this.userId,
+      required this.id,
+      required this.title,
+      required this.body});
+
+  // Ручная сериализация
+  factory Post.fromJson(Map<String, dynamic> json) {
+    return Post(
+      userId: json['userId'],
+      id: json['id'],
+      title: json['title'],
+      body: json['body'],
+    );
+  }
+
+  // Ручная сериализация
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'id': id,
+      'title': title,
+      'body': body,
+    };
+  }
+}
+
+// Модель для автогенерации с json_serializable
+@JsonSerializable()
+class Comment {
+  final int postId;
+  final int id;
+  final String name;
+  final String email;
+  final String body;
+
+  Comment(
+      {required this.postId,
+      required this.id,
+      required this.name,
+      required this.email,
+      required this.body});
+
+  factory Comment.fromJson(Map<String, dynamic> json) =>
+      _$CommentFromJson(json);
+  Map<String, dynamic> toJson() => _$CommentToJson(this);
+}
+
+class JsonExample extends StatefulWidget {
+  @override
+  _JsonExampleState createState() => _JsonExampleState();
+}
+
+class _JsonExampleState extends State<JsonExample> {
+  List<Post> posts = [];
+  List<Comment> comments = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  // Получение данных
+  Future<void> fetchData() async {
+    // HTTP-запрос для получения постов
+    final postResponse =
+        await http.get(Uri.parse('https://jsonplaceholder.typicode.com/posts'));
+    final commentResponse = await http
+        .get(Uri.parse('https://jsonplaceholder.typicode.com/comments'));
+
+    if (postResponse.statusCode == 200 && commentResponse.statusCode == 200) {
+      // Ручная сериализация JSON для постов
+      final List<dynamic> postJson = jsonDecode(postResponse.body);
+      posts = postJson.map((data) => Post.fromJson(data)).toList();
+
+      // Автогенерация сериализации JSON для комментариев
+      final List<dynamic> commentJson = jsonDecode(commentResponse.body);
+      comments = commentJson.map((data) => Comment.fromJson(data)).toList();
+
+      setState(() {
+        isLoading = false;
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('JSON Example')),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : ListView(
+              children: [
+                Text(
+                  'Posts (Manual JSON Serialization):',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                ...posts.take(5).map((post) => ListTile(
+                      title: Text(post.title),
+                      subtitle: Text(post.body),
+                    )),
+                Divider(),
+                Text(
+                  'Comments (Generated JSON Serialization):',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                ...comments.take(5).map((comment) => ListTile(
+                      title: Text(comment.name),
+                      subtitle: Text(comment.body),
+                    )),
+              ],
+            ),
+    );
+  }
+}
+```
+<br>
+Для работы json_serializable нужно добавить зависимости в pubspec.yaml:<br>
+
+![image](https://github.com/user-attachments/assets/acef46e0-82c8-40c7-9853-d9a9e7778695)
+
+<br>
+В итоге получаем:<br>
+
+1. Загрузка данных:<br>
+
+![image](https://github.com/user-attachments/assets/79a5cc6c-3d0f-4eea-a0a3-035609019540)
+
+<br>
 
 
+2. Первые 5 постов(заголовок и описпние):<br>
 
+![image](https://github.com/user-attachments/assets/3827af24-1ada-4b72-9ab6-8948212256ed)
+
+<br>
+
+3. Первые 5 комментариев (имена авторов и комментарии):<br>
+
+![image](https://github.com/user-attachments/assets/b523dacd-4550-4679-9946-2c19e928c528)
+
+<br>
 
 
 
