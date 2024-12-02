@@ -2780,4 +2780,186 @@ class _MyHomePageState extends State<MyHomePage> {
 
 ![image](https://github.com/user-attachments/assets/0086725f-87e9-4ec1-823f-81ee2cf0bec8)
 <br>
+## _**Лекция 12**_
+1. Создаем файл counter_repository.dart, который будет определять интерфейс для работы с данными. Это абстракция, которая позволит легко заменять источник данных.<br>
 
+```dart
+import 'package:shared_preferences/shared_preferences.dart';
+
+class CounterRepository {
+  static const _counterKey = 'counter';
+
+  Future<int> getCounter() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_counterKey) ?? 0;
+  }
+
+  Future<void> setCounter(int value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt(_counterKey, value);
+  }
+}
+```
+<br>
+ 2. Cоздаем слой логики для работы с данным счетчиком counter_use_case.dart.<br>
+ 
+ ```dart
+ import '../data/counter_repository.dart';
+
+class CounterUseCase {
+  final CounterRepository repository;
+
+  CounterUseCase(this.repository);
+
+  Future<int> getCounter() {
+    return repository.getCounter();
+  }
+
+  Future<void> incrementCounter() async {
+    final currentValue = await repository.getCounter();
+    await repository.setCounter(currentValue + 1);
+  }
+
+  Future<void> decrementCounter() async {
+    final currentValue = await repository.getCounter();
+    await repository.setCounter(currentValue - 1);
+  }
+}
+```
+<br>
+
+3. Создаем экран с кнопками для увеличения и уменьшения счетчикаcounter_screen.dart.<br>
+```dart
+import 'package:flutter/material.dart';
+import '../domain/counter_use_case.dart';
+import '../data/counter_repository.dart';
+
+class CounterScreen extends StatefulWidget {
+  @override
+  _CounterScreenState createState() => _CounterScreenState();
+}
+
+class _CounterScreenState extends State<CounterScreen> {
+  late final CounterUseCase _counterUseCase;
+  int _counter = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _counterUseCase = CounterUseCase(CounterRepository());
+    _loadCounter();
+  }
+
+  // Загрузка значения счетчика
+  Future<void> _loadCounter() async {
+    final counterValue = await _counterUseCase.getCounter();
+    setState(() {
+      _counter = counterValue;
+    });
+  }
+
+  // Увеличение счетчика
+  Future<void> _increment() async {
+    await _counterUseCase.incrementCounter();
+    _loadCounter(); // Обновление UI
+  }
+
+  // Уменьшение счетчика
+  Future<void> _decrement() async {
+    await _counterUseCase.decrementCounter();
+    _loadCounter(); // Обновление UI
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Counter App'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'Counter Value:',
+              style: TextStyle(fontSize: 24),
+            ),
+            Text(
+              '$_counter',
+              style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.remove),
+                  onPressed: _decrement,
+                  iconSize: 48,
+                ),
+                IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: _increment,
+                  iconSize: 48,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+4. Создаем файл, который запускает приложение и отображает экран с кнопками main.dart.<br>
+
+```dart
+import 'package:flutter/material.dart';
+import 'presentation/counter_screen.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Clean Architecture',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: CounterScreen(),
+    );
+  }
+}
+```
+<br>
+
+Начальный экран: Когда приложение только запускается, значение счетчика по умолчанию будет равно 0.<br>
+
+![image](https://github.com/user-attachments/assets/7c5c874a-7416-4435-9e48-d30a67e35f28)
+
+<br>
+
+Нажатие на "плюс":<br>
+При нажатии на кнопку с иконкой плюса, значение счетчика увеличится на 1.<br>
+
+![image](https://github.com/user-attachments/assets/21767541-5298-4f75-812b-5541ff23bf5f)
+
+<br>
+Нажатие на "минус":<br>
+
+При нажатии  на кнопку с иконкой минуса, значение счетчика уменьшится на 1.<br>
+
+![image](https://github.com/user-attachments/assets/0cdd5de1-d5b4-486f-9b5b-383adb8f90d0)
+
+<br>
+
+Перезапуск приложения:<br>
+
+Значение счетчика будет сохраняться, поскольку использую SharedPreferences для хранения текущего состояния. <br>
+
+![image](https://github.com/user-attachments/assets/afd7634a-362b-4061-b2bc-bab2f40d183c)
+<br>
