@@ -1889,4 +1889,768 @@ class _JsonExampleState extends State<JsonExample> {
 <br>
 
 
+## _**Лекция 9**_
+1. setState — это самый простой способ управления состоянием в Flutter. Это метод, который уведомляет Flutter о необходимости перерисовать виджеты с изменившимися данными. Используется для управления состоянием в пределах одного виджета.<br>
 
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: CounterApp(),
+    );
+  }
+}
+
+class CounterApp extends StatefulWidget {
+  @override
+  _CounterAppState createState() => _CounterAppState();
+}
+
+class _CounterAppState extends State<CounterApp> {
+  int _counter = 0;
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("setState Example")),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Counter value:', style: TextStyle(fontSize: 20)),
+            Text('$_counter', style: TextStyle(fontSize: 40)),
+            ElevatedButton(
+              onPressed: _incrementCounter,
+              child: Text("Increment"),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/74974dd0-2352-474a-90c4-bc64e285aa97)
+
+<br>
+
+2. Использование InheritedWidget<br>
+InheritedWidget используется для предоставления данных вниз по дереву виджетов без необходимости передавать их явно.<br>
+
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class IndexProvider extends InheritedWidget {
+  final int index;
+  final Function(int) onIndexChanged;
+
+  const IndexProvider({
+    required this.index,
+    required this.onIndexChanged,
+    required Widget child,
+  }) : super(child: child);
+
+  static IndexProvider? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<IndexProvider>();
+  }
+
+  @override
+  bool updateShouldNotify(covariant IndexProvider oldWidget) {
+    return oldWidget.index != index;
+  }
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: IndexManager(),
+    );
+  }
+}
+
+class IndexManager extends StatefulWidget {
+  @override
+  _IndexManagerState createState() => _IndexManagerState();
+}
+
+class _IndexManagerState extends State<IndexManager> {
+  int _currentIndex = 0;
+
+  void _updateIndex(int newIndex) {
+    setState(() {
+      _currentIndex = newIndex;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IndexProvider(
+      index: _currentIndex,
+      onIndexChanged: _updateIndex,
+      child: MyHomepage(),
+    );
+  }
+}
+
+class MyHomepage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final indexProvider = IndexProvider.of(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("InheritedWidget Example"),
+      ),
+      body: Center(
+        child: Text(
+          'Current index: ${indexProvider?.index ?? 0}',
+          style: TextStyle(fontSize: 24),
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: indexProvider!.index,
+        onTap: indexProvider.onIndexChanged,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.settings), label: "Settings"),
+        ],
+      ),
+    );
+  }
+}
+```
+<br>
+
+Вывод в центре экрана: Current index: 0 <br>
+Это значение _currentIndex по умолчанию, установленное в IndexManager.<br>
+
+![image](https://github.com/user-attachments/assets/959c413e-d030-4a6d-a71d-8dbf853137ea)
+
+<br>
+ При нажатии на вторую кнопку навигации (Search):<br>
+BottomNavigationBar обновляет индекс через IndexProvider.<br>
+На экране отобразится: Current index: 1<br>
+
+![image](https://github.com/user-attachments/assets/f881e881-6be4-4efe-8ab4-3349f62839f2)
+
+<br>
+При нажатии на третью кнопку навигации (Settings):<br>
+На экране отобразится: Current index: 2.<br>
+
+![image](https://github.com/user-attachments/assets/0c56870c-d3f6-4c53-aa2f-a440f2b89068)
+<br>
+Эта информация (Current index) обновляется автоматически благодаря механизму обновления InheritedWidget, который уведомляет зависимые виджеты об изменении состояния.<br>
+
+3. Демонстрирую использование InheritedWidget для управления состоянием и изменения цвета контейнера:<br>
+
+```dart
+import 'dart:math';
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(AppDataProvider(
+    appData: AppData(backgroundColor: Colors.green),
+    child: const MaterialApp(
+      home: HomePage(),
+    ),
+  ));
+}
+
+/// Класс AppData для хранения данных о цвете
+class AppData {
+  Color backgroundColor;
+
+  AppData({required this.backgroundColor});
+
+  /// Метод для изменения цвета
+  void changeBackgroundColor(Color newColor) {
+    backgroundColor = newColor;
+  }
+}
+
+/// AppDataProvider, наследует InheritedWidget
+class AppDataProvider extends InheritedWidget {
+  const AppDataProvider({
+    required this.appData,
+    required super.child,
+    super.key,
+  });
+
+  final AppData appData;
+
+  static AppDataProvider? of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<AppDataProvider>();
+
+  /// Метод для уведомления Flutter о необходимости обновления виджетов
+  @override
+  bool updateShouldNotify(AppDataProvider oldWidget) {
+    return true; // Всегда уведомляем о любых изменениях
+  }
+}
+
+/// Главная страница с контейнером и кнопкой для изменения цвета
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("InheritedWidget Example")),
+      body: Center(
+        child: Container(
+          width: 200,
+          height: 200,
+          color: AppDataProvider.of(context)?.appData.backgroundColor,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                AppDataProvider.of(context)
+                        ?.appData
+                        .backgroundColor
+                        .toString() ??
+                    '',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    AppDataProvider.of(context)
+                        ?.appData
+                        .changeBackgroundColor(Util.randomColor());
+                  });
+                },
+                child: const Text('Change Color'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+class Util {
+  static Color randomColor() {
+    return Color(Random().nextInt(0xffffffff)).withOpacity(1.0);
+  }
+}
+```
+<br>
+Цвет контейнера: зелёный (Colors.green), установленный в main.<br>
+В тексте внутри контейнера будет отображаться код цвета (например, Color(0xff00ff00)).<br>
+
+![image](https://github.com/user-attachments/assets/7a0ada62-9b78-479f-a902-ebc7786b9dec)
+
+После нажатия на кнопку "Change Color":<br>
+
+Цвет контейнера изменится на случайный.<br>
+Код нового цвета будет отображаться в тексте внутри контейнера.<br>
+
+![image](https://github.com/user-attachments/assets/720fc28c-715e-4922-a08d-aed82259e6d8)
+<br>
+4. Код для реализации изменения цвета с использованием ChangeNotifierProvider из пакета provider. Код включает основные возможности, такие как подписка на изменения состояния с помощью watch и обновление данных через read.<br>
+
+```dart
+import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+
+class AppData with ChangeNotifier {
+  Color backgroundColor;
+
+  AppData({required this.backgroundColor});
+
+  void changeBackgroundColor(Color newColor) {
+    backgroundColor = newColor;
+    notifyListeners();
+  }
+}
+
+
+class Util {
+  static Color randomColor() {
+    return Color(Random().nextInt(0xffffffff)).withOpacity(1.0);
+  }
+}
+
+void main() {
+  runApp(ChangeNotifierProvider(
+    create: (context) => AppData(backgroundColor: Colors.green),
+    child: const MyApp(),
+  ));
+}
+
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Provider Example',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const HomePage(),
+    );
+  }
+}
+
+/// Главная страница
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Provider Example')),
+      body: Center(
+        child: Container(
+          width: 200,
+          height: 200,
+          color: context.watch<AppData>().backgroundColor,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+             
+              Text(
+                context.watch<AppData>().backgroundColor.toString(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 10),
+
+              
+              ElevatedButton(
+                onPressed: () {
+                  context
+                      .read<AppData>()
+                      .changeBackgroundColor(Util.randomColor());
+                },
+                child: const Text('Change Color'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+При запуске контейнер отображает цвет Colors.green и текст Color(0xff00ff00).<br>
+
+![image](https://github.com/user-attachments/assets/7897106f-f495-405f-b3d4-ce4b42d2f1d9)
+
+<br>
+При нажатии кнопки:<br>
+Генерируется новый случайный цвет.<br>
+Фон контейнера и текст обновляются автоматически, благодаря механизму уведомления notifyListeners.<br>
+
+![image](https://github.com/user-attachments/assets/84f1d46d-d33c-4db4-9766-daef1370e241)
+
+<br>
+
+## _**Лекция 10**_
+Потоки (Streams) в Dart — это последовательности асинхронных данных, которые передаются с течением времени. Основная цель — это абстракция работы с асинхронными данными, например, событиями, полученными с серверов или пользовательским вводом.<br>
+
+#1. Проект Flutter с использованием BLoC<br>
+
+BLoC (Business Logic Component) — это архитектурный паттерн, который отделяет бизнес-логику от UI-слоя в приложении. В нем вся логика работы с состояниями представлена потоками.<br>
+
+Компоненты BLoC:<br>
+
+Входные потоки — принимают события (например, действия пользователя).<br>
+Выходные потоки — из которых получаем данные (например, новые состояния).<br>
+
+1. Установка зависимостей<br>
+В pubspec.yaml добавляю зависимости для flutter_bloc:<br>
+
+![image](https://github.com/user-attachments/assets/05430121-b8b2-42c0-85f2-049a79a4c920)
+
+<br>
+2. Создаю файл counter_event.dart<br>
+
+```dart
+abstract class CounterEvent {}
+class IncrementCounter extends CounterEvent {} // Событие увеличения счетчика
+class DecrementCounter extends CounterEvent {}  // Событие уменьшения счетчика
+```
+<br>
+3. Создаю файл counter_state.dart<br>
+
+```dart
+abstract class CounterState {
+  final int counterValue;
+  CounterState({required this.counterValue});
+}
+
+class CounterInitial extends CounterState {
+  CounterInitial({required int counterValue})
+      : super(counterValue: counterValue);
+}
+
+class CounterChanged extends CounterState {
+  CounterChanged({required int counterValue})
+      : super(counterValue: counterValue);
+}
+```
+<br>
+
+4. Создаю файл counter_bloc.dart<br>
+
+```dart
+// lib/bloc/counter_bloc.dart
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'counter_event.dart';
+import 'counter_state.dart';
+
+class CounterBloc extends Bloc<CounterEvent, CounterState> {
+  CounterBloc() : super(CounterInitial(counterValue: 0)); // начальное состояние
+
+  @override
+  Stream<CounterState> mapEventToState(CounterEvent event) async* {
+    if (event is IncrementCounter) {
+      // Если событие Increment, увеличиваем счетчик
+      yield CounterChanged(counterValue: state.counterValue + 1);
+    } else if (event is DecrementCounter) {
+      // Если событие Decrement, уменьшаем счетчик
+      yield CounterChanged(counterValue: state.counterValue - 1);
+    }
+  }
+}
+```
+<br>
+5. В main.dart создаю основной экран и используйте BlocProvider и BlocBuilder для работы с BLoC.<br>
+
+```dart
+// lib/main.dart
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'bloc/counter_bloc.dart';
+import 'bloc/counter_event.dart';
+import 'bloc/counter_state.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: BlocProvider(
+        create: (context) => CounterBloc(), // Провайдер BLoC
+        child: CounterScreen(),
+      ),
+    );
+  }
+}
+
+class CounterScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('BLoC Example')),
+      body: Center(
+        child: BlocBuilder<CounterBloc, CounterState>(
+          builder: (context, state) {
+            int counterValue = state.counterValue;
+
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Counter: $counterValue', style: TextStyle(fontSize: 32)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        BlocProvider.of<CounterBloc>(context)
+                            .add(IncrementCounter()); // отправляем событие
+                      },
+                      child: Text('Increment'),
+                    ),
+                    SizedBox(width: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        BlocProvider.of<CounterBloc>(context)
+                            .add(DecrementCounter()); // отправляем событие
+                      },
+                      child: Text('Decrement'),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+
+При запуске:<br>
+
+![image](https://github.com/user-attachments/assets/484e13ef-6f74-47df-b8a1-e635322e9ba7)
+
+При нажатии кнопки Increment:<br>
+
+![image](https://github.com/user-attachments/assets/7c16e289-77e3-43a5-8246-08583a48fee4)
+
+<br>
+При нажатии на кнопку Decrement:<br>
+
+![image](https://github.com/user-attachments/assets/d0ef5e84-1b42-47c2-a48b-d364192f8a7d)
+
+<br>
+#2. Проект Flutter с использованием Cubit<br>
+
+1. Создаю файл counter_state.dart<br>
+
+```dart
+abstract class CounterState {
+  final int counterValue;
+  CounterState({required this.counterValue});
+}
+
+class CounterInitial extends CounterState {
+  CounterInitial({required int counterValue})
+      : super(counterValue: counterValue);
+}
+
+class CounterChanged extends CounterState {
+  CounterChanged({required int counterValue})
+      : super(counterValue: counterValue);
+}
+```
+<br>
+
+2. Создаю файл counter_cubit.dart<br>
+
+```dart
+// lib/cubit/counter_cubit.dart
+
+import 'package:bloc/bloc.dart';
+import 'counter_state.dart';
+
+class CounterCubit extends Cubit<CounterState> {
+  CounterCubit()
+      : super(CounterInitial(counterValue: 0)); // начальное состояние
+
+  void increment() {
+    int newValue = state.counterValue + 1;
+    emit(CounterChanged(counterValue: newValue)); // изменяем состояние
+  }
+
+  void decrement() {
+    int newValue = state.counterValue - 1;
+    emit(CounterChanged(counterValue: newValue)); // изменяем состояние
+  }
+}
+```
+<br>
+3. В main.dart создаю основной экран и использую BlocProvider и BlocBuilder для работы с Cubit.<br>
+
+```dart
+// lib/main.dart
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'cubit/counter_cubit.dart';
+import 'cubit/counter_state.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: BlocProvider(
+        create: (context) => CounterCubit(), // Провайдер Cubit
+        child: CounterScreen(),
+      ),
+    );
+  }
+}
+
+class CounterScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Cubit Example')),
+      body: Center(
+        child: BlocBuilder<CounterCubit, CounterState>(
+          builder: (context, state) {
+            int counterValue = state.counterValue;
+
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Counter: $counterValue', style: TextStyle(fontSize: 32)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        BlocProvider.of<CounterCubit>(context)
+                            .increment(); // отправляем метод
+                      },
+                      child: Text('Increment'),
+                    ),
+                    SizedBox(width: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        BlocProvider.of<CounterCubit>(context)
+                            .decrement(); // отправляем метод
+                      },
+                      child: Text('Decrement'),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+
+Результат:<br>
+При нажатии на кнопку Increment:<br>
+
+![image](https://github.com/user-attachments/assets/2a0000c4-6c6a-4ceb-9d2d-575bf7fc46ed)
+
+<br>
+
+При нажатии на кнопку Decrement:<br>
+
+![image](https://github.com/user-attachments/assets/0a0aeac8-2529-46b2-8948-e1b7dcad1699)
+
+<br>
+
+#Использованием Cubit вместо BLoC, который выполняет ту же задачу (изменение цвета при нажатии на кнопку).<br>
+
+1. Создание класса ColorCubit:<br>
+
+```dart
+import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
+
+// Утилита для генерации случайного цвета
+class Util {
+  static Color randomColor() {
+    final random = (DateTime.now().millisecondsSinceEpoch % 256);
+    return Color.fromRGBO(random, random, random, 1);
+  }
+}
+
+// Cubit для управления состоянием цвета
+class ColorCubit extends Cubit<Color> {
+  ColorCubit() : super(Colors.green); // начальный цвет зеленый
+
+  // Метод для смены цвета
+  void changeColor() {
+    emit(Util.randomColor()); // генерируем и отправляем новый случайный цвет
+  }
+}
+```
+<br>
+
+2. Создание экрана с UI для работы с Cubit:<br>
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'cubit/color_cubit.dart'; // Импортируем наш Cubit
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Cubit Color Change')),
+      body: BlocProvider(
+        create: (context) =>
+            ColorCubit(), // Создаем и передаем Cubit в дерево виджетов
+        child: Center(
+          child: BlocBuilder<ColorCubit, Color>(
+            // Подписываемся на изменения цвета
+            builder: (context, state) {
+              return Container(
+                width: 200,
+                height: 200,
+                color: state, // Используем состояние (цвет)
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(state.toString()), // Показываем цвет в виде строки
+                    ElevatedButton(
+                      onPressed: () {
+                        // Отправляем событие для смены цвета
+                        context.read<ColorCubit>().changeColor();
+                      },
+                      child: const Text('Change color'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+void main() {
+  runApp(MaterialApp(home: HomePage()));
+}
+```
+<br>
+
+![image](https://github.com/user-attachments/assets/212a1baa-0621-4ebb-81d4-895835cf37f8)
+
+<br>
+
+![image](https://github.com/user-attachments/assets/5bb292e8-d537-427a-87a4-864b5eb44a52)
+
+<br>
