@@ -2566,7 +2566,7 @@ class CounterScreen extends StatelessWidget {
 
 <br>
 
-#Использованием Cubit вместо BLoC, который выполняет ту же задачу (изменение цвета при нажатии на кнопку).<br>
+#3 Использую Cubit вместо BLoC, который выполняет ту же задачу (изменение цвета при нажатии на кнопку).<br>
 
 1. Создание класса ColorCubit:<br>
 
@@ -2654,3 +2654,130 @@ void main() {
 ![image](https://github.com/user-attachments/assets/5bb292e8-d537-427a-87a4-864b5eb44a52)
 
 <br>
+
+## _**Лекция 11**_
+1. Установка зависимостей<br>
+
+![image](https://github.com/user-attachments/assets/995d316f-181b-4b86-93ec-5108deb19729)
+
+<br>
+2. В main.dart:<br>
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Shared Preferences Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int? _counter;
+  String? _action;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData(); // Загружаем данные при запуске
+  }
+
+  
+  Future<void> _loadData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _counter = prefs.getInt('counter') ?? 0; 
+      _action = prefs.getString('action') ?? 'No action';
+    });
+  }
+
+
+  Future<void> _saveData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('counter', (_counter ?? 0) + 1); // Увеличиваем счетчик
+    await prefs.setString('action', 'Incremented');
+    _loadData(); 
+  }
+
+ 
+  Future<void> _clearData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('counter');
+    await prefs.remove('action');
+    _loadData(); 
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Shared Preferences Demo'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'Counter value: ${_counter ?? 'No data'}',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            Text(
+              'Last action: $_action',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _saveData,
+              child: Text('Increment Counter'),
+            ),
+            ElevatedButton(
+              onPressed: _clearData,
+              child: Text('Clear Data'),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+Запуск:<br>
+При запуске: Отобразится текущий счётчик (начальное значение 0) и последнее действие (No action).<br>
+
+![image](https://github.com/user-attachments/assets/0612316f-35bc-4664-8da6-a709b3e96df9)
+
+<br>
+
+При нажатии "Increment Counter":<br>
+Увеличивает счётчик на 1.<br>
+Сохраняет новое значение счётчика и действие в SharedPreferences.<br>
+
+![image](https://github.com/user-attachments/assets/7258889f-bf70-4403-81d2-1910b937a174)
+
+<br>
+При нажатии "Clear Data":<br>
+Удаляет сохранённые данные из хранилища.<br>
+Интерфейс обновляется и показывает начальные значения.<br>
+
+![image](https://github.com/user-attachments/assets/0086725f-87e9-4ec1-823f-81ee2cf0bec8)
+<br>
+
