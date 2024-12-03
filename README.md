@@ -73,20 +73,26 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
 }
 ```
 <br>
-При нажатии цвет фона менется на другой <br>
+При нажатии цвет фона менется на другой<br>
 
 ![image](https://github.com/user-attachments/assets/b9723154-abb2-4007-a336-4453ac0925e6)
 <br>
-3. Работа с Asset
+3. Работа с Asset<br>
+
 3.1 Создаю новую папку с именем "Asset" <br>
 ![image](https://github.com/user-attachments/assets/bb80a1dd-da54-437d-98f3-af4bb5e3cd4d)
 <br>
 3.2 Добавляю в эту папку изображение <br>
+
 3.3 Добавляю код в файл с расширением yaml <br>
+
   ![image](https://github.com/user-attachments/assets/4c949fd5-434d-4d9b-b701-40d2d0609b85)
 <br>
+
   ![image](https://github.com/user-attachments/assets/355b7782-b480-4589-ac5d-a0b093b764a7)
 <br>
+
+
 3.4 Изменяем код в main.dart <br>
  
 ```dart
@@ -2781,7 +2787,7 @@ class _MyHomePageState extends State<MyHomePage> {
 ![image](https://github.com/user-attachments/assets/0086725f-87e9-4ec1-823f-81ee2cf0bec8)
 <br>
 ## _**Лекция 12**_
-1. Создаем файл counter_repository.dart, который будет определять интерфейс для работы с данными. Это абстракция, которая позволит легко заменять источник данных.<br>
+1. Создаю файл counter_repository.dart, который будет определять интерфейс для работы с данными. Это абстракция, которая позволит легко заменять источник данных.<br>
 
 ```dart
 import 'package:shared_preferences/shared_preferences.dart';
@@ -2801,7 +2807,7 @@ class CounterRepository {
 }
 ```
 <br>
- 2. Cоздаем слой логики для работы с данным счетчиком counter_use_case.dart.<br>
+ 2. Cоздаю слой логики для работы с данным счетчиком counter_use_case.dart.<br>
  
  ```dart
  import '../data/counter_repository.dart';
@@ -2828,7 +2834,8 @@ class CounterUseCase {
 ```
 <br>
 
-3. Создаем экран с кнопками для увеличения и уменьшения счетчикаcounter_screen.dart.<br>
+3. Создаю  экран с кнопками для увеличения и уменьшения счетчикаcounter_screen.dart.<br>
+
 ```dart
 import 'package:flutter/material.dart';
 import '../domain/counter_use_case.dart';
@@ -2911,7 +2918,7 @@ class _CounterScreenState extends State<CounterScreen> {
 }
 ```
 <br>
-4. Создаем файл, который запускает приложение и отображает экран с кнопками main.dart.<br>
+4. Создаю файл, который запускает приложение и отображает экран с кнопками main.dart.<br>
 
 ```dart
 import 'package:flutter/material.dart';
@@ -3062,7 +3069,7 @@ void main() {
 <br>
 
 Файлы user.freezed.dart и user.g.dart сгенерированы в папке lib.<br>
-3. Добавить зависимости<br>
+3. Добавляю зависимости<br>
 
 ![image](https://github.com/user-attachments/assets/870eafaa-2b3c-4815-8d5b-2a3497719773)
 
@@ -3193,7 +3200,7 @@ class CounterScreen extends StatelessWidget {
 }
 ```
 <br>
-Добавьте экран в приложение<br>
+Добавляю экран в приложение<br>
 Файл main.dart<br>
 
 ```dart
@@ -3253,7 +3260,7 @@ counter_app/<br>
 }
 ```
 <br>
-4. Создайте файл тестов<br>
+4. Создаю файл тестов<br>
 counter_test.dart:<br>
 
 ```dart
@@ -3329,11 +3336,9 @@ void main() {
     // Строим виджет с заданными значениями
     await tester.pumpWidget(const MyWidget(title: 'T', message: 'M'));
 
-    // Создаем Finders для поиска текста
     final titleFinder = find.text('T');
     final messageFinder = find.text('M');
 
-    // Проверяем, что виджеты с заданными текстами находятся на экране
     expect(titleFinder, findsOneWidget);
     expect(messageFinder, findsOneWidget);
   });
@@ -3355,18 +3360,16 @@ void main() {
       items: List<String>.generate(10000, (i) => 'Item $i'),
     ));
 
-    // Ищем список и элемент, который нужно найти
+
     final listFinder = find.byType(Scrollable);
     final itemFinder = find.byKey(const ValueKey('item_50_text'));
 
-    // Прокручиваем список до элемента
     await tester.scrollUntilVisible(
       itemFinder,
       500.0, // Прокручиваем на 500 пикселей
       scrollable: listFinder,
     );
 
-    // Проверяем, что элемент найден
     expect(itemFinder, findsOneWidget);
   });
 }
