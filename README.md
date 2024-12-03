@@ -2963,3 +2963,439 @@ class MyApp extends StatelessWidget {
 
 ![image](https://github.com/user-attachments/assets/afd7634a-362b-4061-b2bc-bab2f40d183c)
 <br>
+
+## _**Лекция 13**_
+1. Установка пакета build_runner<br>
+
+![image](https://github.com/user-attachments/assets/e622715d-b8fa-451b-8518-8bc5aa4b1826)
+<br>
+
+2. Генерация кода с использованием build_runner
+Однократная сборка<br>
+Чтобы сгенерировать файлы только один раз, выполнить команду:<br>
+dart run build_runner build<br>
+
+![image](https://github.com/user-attachments/assets/b2beb526-30c3-4f54-b1ec-37e370e273da)
+<br>
+
+Постоянное отслеживание изменений (watch)<br>
+Чтобы автоматически отслеживать изменения в файлах и обновлять сгенерированные файлы:<br>
+dart run build_runner watch<br>
+
+![image](https://github.com/user-attachments/assets/9cf1ceb3-f939-4879-aa0b-446e35e3bcb7)
+
+<br>
+2.  Freezed<br>
+Freezed – это пакет для генерации кода, который помогает создавать классы данных в Dart.<br>
+Freezed –  надежный и масштабируемый генератор кода для классов данных. Он надежен, но имеет недостаток: новичкам действительно сложно найти правильное сочетание и необходимые функции для использования в логике своего приложения. Итак, Freezed — это один из пакетов, который используется для создания дата и union классов. Кроме того, его можно использовать для сериализации и десериализации данных JSON.<br>
+Установка расширений:<br>
+
+![image](https://github.com/user-attachments/assets/3c916dad-c955-4510-86d0-ac62ba02a0c2)
+
+<br>
+Создание файла user.dart<br>
+
+```dart
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'user.freezed.dart';
+part 'user.g.dart';
+
+@freezed
+class User with _$User {
+  const factory User({
+    required int id,
+    required String name,
+    required String email,
+    required String avatar,
+  }) = _User;
+
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+}
+```
+<br>
+@freezed: Указывает, что для этого класса будет сгенерирован шаблонный код.<br>
+part 'user.freezed.dart';: Ссылка на файл сгенерированного кода для класса данных (методы copyWith, toString, ==, и т.д.).<br>
+part 'user.g.dart';: Ссылка на файл сгенерированного кода для сериализации (fromJson и toJson).<br>
+3. Запуск генератора<br>
+Выполнить команду:<br>
+flutter pub run build_runner build<br>
+
+Создание объекта и использование copyWith:<br>
+```dart
+void main() {
+  final user = User(
+    id: 1,
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    avatar: 'avatar_url',
+  );
+
+  print(user); // toString автоматически сгенерирован
+  final updatedUser = user.copyWith(name: 'Jane Doe');
+  print(updatedUser);
+}
+```
+<br>
+
+Сериализация/десериализация:<br>
+
+```dart
+void main() {
+  // Пример JSON
+  final json = {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "avatar": "avatar_url"
+  };
+
+  // Десериализация
+  final user = User.fromJson(json);
+  print(user);
+
+  // Сериализация
+  final jsonData = user.toJson();
+  print(jsonData);
+}
+```
+<br>
+
+Файлы user.freezed.dart и user.g.dart сгенерированы в папке lib.<br>
+3. Добавить зависимости<br>
+
+![image](https://github.com/user-attachments/assets/870eafaa-2b3c-4815-8d5b-2a3497719773)
+
+<br>
+
+Создаю событие (CounterEvent)<br>
+
+```dart
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'counter_event.freezed.dart';
+
+@freezed
+class CounterEvent with _$CounterEvent {
+  const factory CounterEvent.incremented(int incrementBy) = CounterIncremented;
+  const factory CounterEvent.decremented(int decrementBy) = CounterDecremented;
+}
+```
+<br>
+Создаю состояние (DataState)<br>
+
+```dart
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'data_state.freezed.dart';
+
+@freezed
+class DataState with _$DataState {
+  const factory DataState.initial(bool isLoading) = DataInitial;
+  const factory DataState.error(String message, bool isLoading) = DataError;
+  const factory DataState.success(int count, bool isLoading) = DataSuccess;
+}
+```
+<br>
+Создаю сам BLoC (CounterBloc)<br>
+
+```dart
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'counter_event.dart';
+import 'data_state.dart';
+
+class CounterBloc extends Bloc<CounterEvent, DataState> {
+  CounterBloc() : super(const DataState.initial(false)) {
+    on<CounterIncremented>(_onIncremented);
+    on<CounterDecremented>(_onDecremented);
+  }
+
+  void _onIncremented(CounterIncremented event, Emitter<DataState> emit) {
+    final currentState = state;
+    if (currentState is DataSuccess) {
+      emit(DataState.success(currentState.count + event.incrementBy, false));
+    } else {
+      emit(DataState.success(event.incrementBy, false));
+    }
+  }
+
+  void _onDecremented(CounterDecremented event, Emitter<DataState> emit) {
+    final currentState = state;
+    if (currentState is DataSuccess) {
+      emit(DataState.success(currentState.count - event.decrementBy, false));
+    } else {
+      emit(DataState.success(-event.decrementBy, false));
+    }
+  }
+}
+```
+<br>
+Использование в UI<br>
+Теперь создаю виджет, который использует BLoC и Freezed для управления состоянием.<br>
+Создаю файл counter_screen.dart:<br>
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'counter_bloc.dart';
+import 'counter_event.dart';
+import 'data_state.dart';
+
+class CounterScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => CounterBloc(),
+      child: Scaffold(
+        appBar: AppBar(title: Text("Counter")),
+        body: BlocBuilder<CounterBloc, DataState>(
+          builder: (context, state) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (state.isLoading) CircularProgressIndicator(),
+                  state.when(
+                    initial: (_) => Text("Press a button to start"),
+                    error: (message, _) => Text("Error: $message"),
+                    success: (count, _) => Text("Count: $count"),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          context
+                              .read<CounterBloc>()
+                              .add(CounterEvent.incremented(1));
+                        },
+                        child: Text("Increment"),
+                      ),
+                      SizedBox(width: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          context
+                              .read<CounterBloc>()
+                              .add(CounterEvent.decremented(1));
+                        },
+                        child: Text("Decrement"),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+Добавьте экран в приложение<br>
+Файл main.dart<br>
+
+```dart
+import 'package:flutter/material.dart';
+import 'counter_screen.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: CounterScreen(),
+    );
+  }
+}
+```
+<br>
+Результат:<br>
+
+Экран с кнопками для инкремента и декремента счетчика. Состояния и события управляются с использованием Freezed и BLoC<br>
+
+## _**Лекция 14**_
+
+#1. Создаю структуру проекта<br>
+counter_app/<br>
+  lib/<br>
+  test/<br>
+2. Устанавливаю пакет test<br>
+Выполняю команду:flutter pub add dev:test<br>
+После этого в файле pubspec.yaml появится запись:<br>
+dev_dependencies:<br>
+  test: ^<latest_version><br>
+Выполняю команду:<br>
+flutter pub get<br>
+3. Создаю основной класс Counter<br>
+counter_app/<br>
+  lib/<br>
+    counter.dart<br>
+   counter.dart:<br>
+   
+   ```dart
+   class Counter {
+  int value = 0;
+
+  void increment() => value++;
+
+  void decrement() => value--;
+}
+```
+<br>
+4. Создайте файл тестов<br>
+counter_test.dart:<br>
+
+```dart
+import 'package:counter_app/counter.dart';
+import 'package:test/test.dart';
+
+void main() {
+  group('Counter', () {
+    test('value should start at 0', () {
+      expect(Counter().value, 0);
+    });
+
+    test('value should be incremented', () {
+      final counter = Counter();
+
+      counter.increment();
+
+      expect(counter.value, 1);
+    });
+
+    test('value should be decremented', () {
+      final counter = Counter();
+
+      counter.decrement();
+
+      expect(counter.value, -1);
+    });
+  });
+}
+```
+<br>
+При запуске:<br>
+
+![image](https://github.com/user-attachments/assets/2bad55ac-cdcb-406f-a81c-8dbb7967a0f4)
+<br>
+
+#2. Основы Widget тестирования<br>
+Создаю простой виджет MyWidget, который принимает два параметра — заголовок и сообщение, и отображает их на экране.<br>
+
+```dart
+class MyWidget extends StatelessWidget {
+  const MyWidget({
+    super.key,
+    required this.title,
+    required this.message,
+  });
+
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text(title),
+        ),
+        body: Center(
+          child: Text(message),
+        ),
+      ),
+    );
+  }
+}
+```
+<br>
+Тест для виджета MyWidget. Для этого использую функцию testWidgets(), которая создаст WidgetTester и позволит тестировать виджет. <br>
+
+```dart
+void main() {
+  testWidgets('MyWidget has a title and message', (tester) async {
+    // Строим виджет с заданными значениями
+    await tester.pumpWidget(const MyWidget(title: 'T', message: 'M'));
+
+    // Создаем Finders для поиска текста
+    final titleFinder = find.text('T');
+    final messageFinder = find.text('M');
+
+    // Проверяем, что виджеты с заданными текстами находятся на экране
+    expect(titleFinder, findsOneWidget);
+    expect(messageFinder, findsOneWidget);
+  });
+}
+```
+<br>
+
+Прокрутка списка и поиск виджетов<br>
+Используя метод scrollUntilVisible(),можем прокручивать список до тех пор, пока нужный элемент не окажется видимым.<br>
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  testWidgets('Scrolling through a long list', (tester) async {
+    // Создаем длинный список с 10000 элементов
+    await tester.pumpWidget(MyApp(
+      items: List<String>.generate(10000, (i) => 'Item $i'),
+    ));
+
+    // Ищем список и элемент, который нужно найти
+    final listFinder = find.byType(Scrollable);
+    final itemFinder = find.byKey(const ValueKey('item_50_text'));
+
+    // Прокручиваем список до элемента
+    await tester.scrollUntilVisible(
+      itemFinder,
+      500.0, // Прокручиваем на 500 пикселей
+      scrollable: listFinder,
+    );
+
+    // Проверяем, что элемент найден
+    expect(itemFinder, findsOneWidget);
+  });
+}
+```
+<br>
+Создала простой виджет, написала тест для проверки его корректной работы, а затем расширила тест, чтобы убедиться, что можем прокручивать длинные списки и находить в них элементы. 
+Результат выполнения тестов:<br>
+
+
+![image](https://github.com/user-attachments/assets/df1de120-d865-4c50-85a6-869e24b0f6d5)
+<br>
+## _**Входное тестирование**_
+<br>
+
+![image](https://github.com/user-attachments/assets/3806c018-9bdd-4fec-8dce-d01990a1bfca)
+
+
+<br>
+
+## _**Итоговый тест**_
+<br>
+
+![image](https://github.com/user-attachments/assets/8a7cbe11-70bb-4bff-8a66-2383ac15d51d)
+
+<br>
+
+## _**Опросник по итогу прохождения курса/семинара**_
+<br>
+
+![image](https://github.com/user-attachments/assets/b4668368-cd65-4727-83cb-88a6827e1243)
+
+<br>
