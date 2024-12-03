@@ -3392,7 +3392,9 @@ void main() {
 ## _**Итоговый тест**_
 <br>
 
-![image](https://github.com/user-attachments/assets/8a7cbe11-70bb-4bff-8a66-2383ac15d51d)
+![image](https://github.com/user-attachments/assets/7c38da1c-dc50-4735-ae96-bb9958ad713c)
+
+
 
 <br>
 
